@@ -35,6 +35,7 @@ module treeclassifier
         end
     end
 
+
     struct Tree{S, T}
         root   :: NodeMeta{S}
         list   :: Vector{T}
@@ -51,9 +52,9 @@ module treeclassifier
             node                :: NodeMeta{S}, # the node to split
             max_features        :: Int,         # number of features to consider
             max_depth           :: Int,         # the maximum depth of the resultant tree
-            min_samples_leaf    :: Int,         # the minimum number of samples each leaf needs to have
-            min_samples_split   :: Int,         # the minimum number of samples in needed for a split
-            min_purity_increase :: Float64,     # minimum purity needed for a split
+            # min_samples_leaf    :: Int,         # the minimum number of samples each leaf needs to have
+            # min_samples_split   :: Int,         # the minimum number of samples in needed for a split
+            # min_purity_increase :: Float64,     # minimum purity needed for a split
             indX                :: Vector{Int}, # an array of sample indices,
                                                 # we split using samples in indX[node.region]
             # the six arrays below are given for optimization purposes
@@ -284,6 +285,7 @@ module treeclassifier
         stack = NodeMeta{S}[root]
         @inbounds while length(stack) > 0
             node = pop!(stack)
+
             _split!(
                 X, Y, W,
                 loss, node,
