@@ -1,13 +1,14 @@
+#BASE_SCORE = 0.5
 
-
-function _fit_stage(node, features, gradients, hessians)
+function _fit_stage(node, features, gradients, hessians, curr_depth, max_depth)
     split_point     = nothing
     best_gain       = typemin(Float32)
     best_index      = 0
     best_left_score = nothing
     best_right_score =  nothing
-    l_out = nothing
-    r_out = nothing
+    l_out           = nothing
+    r_out           = nothing
+    split_feat      = 0
 
     for i=1:size(features,2)
         ind         = sortperm(features[:,i])
@@ -33,6 +34,7 @@ function _fit_stage(node, features, gradients, hessians)
 
             if curr_score > best_gain
                 best_gain   = curr_score
+                split_feat = i
                 split_point = (x_vals[j] + x_vals[j+1])/2.0
                 best_index  = j
                 best_left_score = left_score
@@ -44,11 +46,25 @@ function _fit_stage(node, features, gradients, hessians)
     end
 
     if best_gain > 0
-        node.splitpoint = split_point
-        node.left_node = Node1(l_out, best_left_score)
-        node.right_node = Node1(r_out, best_right_score)
+        if curr_depth < max_depth
+            node.split_feat = split_feat
+            node.splitpoint = split_point
+            node.left_node = Node(l_out, best_left_score)
+            node.right_node = Node(r_out, best_right_score)
+        else
+            node.split_feat = split_feat
+            node.splitpoint = split_point
+            node.left_node = Leaf(l_out)
+            node.right_node = Leaf(r_out)
+        end
     else
         node.isleaf = true
+        node = Leaf(output)
     end
     return node
+end
+
+function fit(tree::Tree,features, gradients, hessians)
+    curr_depth = 1
+    return _fit_stage(tree.nodes[1], features, gradients, hessians, curr_depth, tree.max_depth)
 end
