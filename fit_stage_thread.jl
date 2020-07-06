@@ -21,7 +21,7 @@ function _fit_stage(node, features, gradients, hessians, curr_depth, max_depth)
     r_out_list          = fill([], num_feat)
     split_feat_list     = fill([], num_feat)
 
-    for i=1:size(features,2)
+    Threads.@threads for i=1:size(features,2)
         ind         = sortperm(features[:,i])
         x_vals      = features[:,i][ind]
         grads_cum   = cumsum(gradients[ind])
